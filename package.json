@@ -1,0 +1,10 @@
+{
+  "name": "bloomon-production-facility",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "preinstall": "echo Starting pre-installation step!",
+    "postinstall": "echo Starting post-installation step!",
+    "start": "node ./server.js test_input.txt"
+  }
+}
