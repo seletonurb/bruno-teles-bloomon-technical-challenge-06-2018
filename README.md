@@ -3,12 +3,9 @@
 # Run
 
 Open a command line terminal and enter the following command:
-`npm start`
+`$ npm start`
 
 # Test
 
 Open a command line terminal and enter the following command:
-`npm run test`
-
-
-# Deployment instructions
+`$ npm run test`
