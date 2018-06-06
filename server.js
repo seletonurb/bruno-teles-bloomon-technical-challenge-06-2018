@@ -1,10 +1,15 @@
 var fs = require('fs'),
   filename,
   inputDesignRules = [],
-  inputFlowers = [],
   designRules = [],
   flowers = [],
-  ProductionFacility = require('./production-facility');
+  helpers = require('./helpers'),
+  ProductionFacility = require('./classes/production-facility'),
+  DesignRule = require('./classes/design-rule'),
+  Flower = require('./classes/flower');
+
+//creates Production facility
+var productionFacility = new ProductionFacility();
 
 function readLine(input, lineNumber) {
   return input[lineNumber];
@@ -13,10 +18,15 @@ function readLine(input, lineNumber) {
 function readData(input) {
   var line,
     totalLines = input.length,
-    isDesignRules = true;
+    isDesignRules = true,
+    inputDesignRule,
+    designRule,
+    bouquet,
+    flower;
 
   for (var i = 0; i < totalLines; i++) {
     line = readLine(input, i);
+    // console.log("line: " + line);
 
     // empty lines evaluates to falsy
     if (!line) {
@@ -25,36 +35,40 @@ function readData(input) {
     }
 
     if (isDesignRules) {
-      inputDesignRules.push(line);
+      inputDesignRule=line;
+      designRule = new DesignRule(inputDesignRule);
+      productionFacility.addDesignRule(designRule);
     } else {
-      inputFlowers.push(line);
+      inputFlower=line;
+      flower = new Flower(inputFlower);
+      productionFacility.addFlower(flower);
+      bouquet = productionFacility.checkBouquetReady();
+      if (bouquet) {
+        console.log(bouquet.toString());
+      }
     }
   }
-  console.log("designRules: " + inputDesignRules.toString());
-  console.log("flowers: " + inputFlowers.toString());
 }
 /* returns input as lines */
 function breakLines(input) {
   return input.split("\n");;
 }
 /********************Manual stdin**********************/
-// var _input = "";
-// process.stdin.resume();
-// process.stdin.setEncoding("ascii");
-//
-// process.stdin.on('data', function (input) {
-//     _input += input;
-// });
-// process.stdin.on('end', function () {
-//   var input_stdin_array = breakLines(input);
-//   readData(input_stdin_array);
-// });
-// process.stdin.on('SIGINT', function () {
-//   var input_stdin_array = breakLines(input);
-//   readData(input_stdin_array);
-// creates Production facility
-// var productionFacility = new ProductionFacility();
-// });
+var _input = "";
+process.stdin.resume();
+process.stdin.setEncoding("ascii");
+
+process.stdin.on('data', function(input) {
+  _input += input;
+});
+process.stdin.on('end', function() {
+  var input_stdin_array = breakLines(input);
+  readData(input_stdin_array);
+});
+process.stdin.on('SIGINT', function() {
+  var input_stdin_array = breakLines(input);
+  readData(input_stdin_array);
+});
 /******************************************************/
 
 /********************File read**********************/
@@ -65,17 +79,21 @@ if (process.argv.length < 3) {
 }
 /* Read the file and print its contents. */
 filename = process.argv[2];
-fs.readFile(filename, 'utf8', function(err, data) {
-  var dataArray;
 
-  if (err) {
-    throw err;
-  }
-  dataArray = breakLines(data);
-  readData(dataArray);
+function readFile() {
+  fs.readFile(filename, 'utf8', function(err, data) {
+    var dataArray;
 
-  // creates Production facility
-  var productionFacility = new ProductionFacility();
-  productionFacility.startBouquetProduction();
-});
+    if (err) {
+      throw err;
+    }
+    dataArray = breakLines(data);
+    readData(dataArray);
+  });
+}
+// dev: wait for inspector
+setTimeout(readFile, 1500, 'funky');
+
+
+
 /******************************************************/
