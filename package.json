@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node --inspect ./server.js test_input.txt",
-    "dev": "node --inspect ./server.js test_input.txt"
+    "start": "node --inspect ./server.js",
+    "test": "node ./test.js test_input.txt",
+    "dev": "node --inspect ./test.js test_input.txt"
   }
 }

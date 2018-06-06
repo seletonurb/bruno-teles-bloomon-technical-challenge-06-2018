@@ -1,11 +1,14 @@
 # Technical challenge: Production facility #
 
-# SUMMARY
+# Run
 
-* Configuration
-* Deployment instructions
+Open a command line terminal and enter the following command:
+`npm start`
 
-# Configuration
+# Test
+
+Open a command line terminal and enter the following command:
+`npm run test`
+
 
 # Deployment instructions
-

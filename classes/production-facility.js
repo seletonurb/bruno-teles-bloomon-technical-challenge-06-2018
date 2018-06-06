@@ -10,7 +10,8 @@
       this.designRules = [];
       // assume facility is organized in flower buckets
       this.flowerBuckets = {};
-      console.log("Production Facility created!");
+      // debug
+      // console.log("Production Facility created!");
     }
     addDesignRule(designRule) {
       this.designRules.push(designRule);
