@@ -33,7 +33,7 @@ function processLine(line) {
     inputFlower = line;
     flower = new Flower(inputFlower);
     productionFacility.addFlower(flower);
-    bouquet = productionFacility.checkBouquetReady();
+    bouquet = productionFacility.checkDesignRulesAndBuildBouquet();
     if (bouquet) {
       console.log(bouquet.toString());
     }

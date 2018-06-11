@@ -28,7 +28,7 @@
       var quantities = [];
 
       for (var key in this.flowerBuckets) {
-        if (this.flowerBuckets.hasOwnProperty(key) && (key[1]===size || !size)) {
+        if (this.flowerBuckets.hasOwnProperty(key) && (key[1] === size || !size)) {
           quantities.push(this.flowerBuckets[key]);
         }
       }
@@ -37,16 +37,16 @@
         return acc + quantity;
       }, 0);
     }
-    buildBouquet(flowerQuantityToSubtractMap, designRule) {
+    buildBouquet(designRule) {
       var bouquet = new Bouquet(designRule.bouquetCode);
       var bouquetSize = designRule.bouquetSize;
       var anyFLowersQuantity = 0;
 
-      for (var key in flowerQuantityToSubtractMap) {
-        if (flowerQuantityToSubtractMap.hasOwnProperty(key)) {
-          var flowerSpeciesCode = key[0];
-          bouquet.addFlowers(flowerSpeciesCode, designRule.speciesQuantityMap[flowerSpeciesCode]);
-          this.flowerBuckets[key] -= designRule.speciesQuantityMap[flowerSpeciesCode];
+      for (var species in designRule.speciesQuantityMap) {
+        if (designRule.speciesQuantityMap.hasOwnProperty(species)) {
+          var key = species + bouquetSize;
+          bouquet.addFlowers(species, designRule.speciesQuantityMap[species]);
+          this.flowerBuckets[key] -= designRule.speciesQuantityMap[species];
         }
       }
 
@@ -82,52 +82,53 @@
 
       return bouquet;
     }
-
-    /* returns a bouquet or undefined if not ready */
-    checkBouquetReady() {
-      var bouquet;
-      var designRule;
+    isBouquetReadyToBuild(designRule) {
       var bouquetSize;
       var key;
       var speciesQuantity;
       var isDesignRuleRespected;
       var tempFlowerTotal;
       var flowerBouquetTotal;
-      var flowerQuantityToSubtractMap;
+
+      bouquetSize = designRule.bouquetSize;
+      isDesignRuleRespected = true;
+      tempFlowerTotal = this.getTotalFlowersInStock(bouquetSize);
+      flowerBouquetTotal = 0;
+
+      for (var species in designRule.speciesQuantityMap) {
+        if (designRule.speciesQuantityMap.hasOwnProperty(species)) {
+          key = species + bouquetSize;
+          speciesQuantity = designRule.speciesQuantityMap[species];
+          if (!this.flowerBuckets[key] || this.flowerBuckets[key] < speciesQuantity) {
+            isDesignRuleRespected = false;
+            break;
+          } else {
+            tempFlowerTotal -= speciesQuantity;
+            flowerBouquetTotal += speciesQuantity;
+          }
+        }
+      }
+
+      // last check is for the necessary quantity of remaining flowers in stock that can fill up the bouquet
+      if (isDesignRuleRespected && tempFlowerTotal >= (designRule.bouquetQuantity - flowerBouquetTotal)) {
+        return true;
+      }
+      return false;
+    }
+    /* returns a bouquet or undefined if not ready */
+    checkDesignRulesAndBuildBouquet() {
+      var bouquet;
+      var designRule;
 
       for (var i = 0; i < this.designRules.length; i++) {
         designRule = this.designRules[i];
-        bouquetSize = designRule.bouquetSize;
-        isDesignRuleRespected = true;
-        tempFlowerTotal = this.getTotalFlowersInStock(bouquetSize);
-        flowerBouquetTotal = 0;
-        flowerQuantityToSubtractMap = {};
-
-        for (var species in designRule.speciesQuantityMap) {
-          if (designRule.speciesQuantityMap.hasOwnProperty(species)) {
-            key = species + bouquetSize;
-            speciesQuantity = designRule.speciesQuantityMap[species];
-            if (!this.flowerBuckets[key] || this.flowerBuckets[key] < speciesQuantity) {
-              isDesignRuleRespected = false;
-              break;
-            } else {
-              flowerQuantityToSubtractMap[key] = speciesQuantity;
-              tempFlowerTotal -= speciesQuantity;
-              flowerBouquetTotal += speciesQuantity;
-            }
-          }
-        }
-
-        // last check is for any remaining flowers species in stock that can fill up the bouquet
-        if (isDesignRuleRespected && tempFlowerTotal >= (designRule.bouquetQuantity-flowerBouquetTotal)) {
+        if (this.isBouquetReadyToBuild(designRule)) {
           // build bouquet
-          bouquet = this.buildBouquet(flowerQuantityToSubtractMap, designRule);
+          bouquet = this.buildBouquet(designRule);
           break;
         }
       };
-
       return bouquet;
-
     }
   }
 })();
