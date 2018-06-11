@@ -2,16 +2,18 @@
   'use strict';
 
   var Bouquet = require('./bouquet'),
-    DesignRule = require('./design-rule');
+    DesignRule = require('./design-rule'),
+    FullStorageError = require('./FullStorageError');
 
 
   module.exports = class ProductionFacility {
-    constructor(designRules) {
+    constructor(maximumStorageCapacity) {
       this.designRules = [];
       // assume facility is organized in flower buckets
       this.flowerBuckets = {};
       // debug
       // console.log("Production Facility created!");
+      this.maximumStorageCapacity = maximumStorageCapacity;
     }
     addDesignRule(designRule) {
       this.designRules.push(designRule);
@@ -19,6 +21,9 @@
     addFlower(flower) {
       var flowerCode = flower.code;
 
+      if (this.maximumStorageCapacity !== undefined && this.getTotalFlowersInStock() + 1 > this.maximumStorageCapacity) {
+        throw new FullStorageError();
+      }
       if (!this.flowerBuckets[flowerCode]) {
         this.flowerBuckets[flowerCode] = 0;
       }

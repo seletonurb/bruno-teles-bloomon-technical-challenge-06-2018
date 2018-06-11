@@ -1,9 +1,21 @@
 var ProductionFacility = require('./classes/production-facility'),
   DesignRule = require('./classes/design-rule'),
-  Flower = require('./classes/flower');
+  Flower = require('./classes/flower'),
+  args,
+  maximumStorageCapacity;
+
+const MAXIMUM_STORAGE_CAPACITY_ARG = 'max_storage';
+const MAXIMUM_STORAGE_CAPACITY = 256;
+
+args = process.argv.slice(2);
+(args || []).forEach(function(arg) {
+  if (arg.indexOf(MAXIMUM_STORAGE_CAPACITY_ARG) !== -1) {
+    maximumStorageCapacity = MAXIMUM_STORAGE_CAPACITY;
+  }
+});
 
 //creates Production facility
-var productionFacility = new ProductionFacility();
+var productionFacility = new ProductionFacility(maximumStorageCapacity);
 // this variable will switch to true when all input Design Rules are read (detection of empty input line)
 var allDesignRulesRead = false;
 
@@ -52,6 +64,11 @@ readData = function(input) {
   // exit after all data is processed
   process.exit(0);
 }
+
+process.on('uncaughtException', function(err, t, r) {
+  console.log('[FATAL] Node process crashed due to: ' + err);
+  process.exit(1);
+});
 
 /********************Manual stdin**********************/
 function removeLineBreaks(str) {
